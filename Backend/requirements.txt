@@ -1,0 +1,7 @@
+flask
+flask-cors
+python-dotenv
+supabase
+flask-jwt-extended
+passlib[bcrypt]
+pydantic

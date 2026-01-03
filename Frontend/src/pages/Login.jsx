@@ -9,27 +9,57 @@ const Login = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
-  const { login } = useAuth()
+ const { setUser, setIsAdmin } = useAuth()
   const navigate = useNavigate()
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    setLoading(true)
+ const handleSubmit = async (e) => {
+  e.preventDefault()
+  setLoading(true)
 
-    try {
-      const success = login(email, password)
-      if (success) {
-        toast.success('Login successful!')
-        navigate('/dashboard')
+  try {
+    const response = await fetch("http://127.0.0.1:5000/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password }),
+    })
+
+    const data = await response.json()
+
+    if (!response.ok) {
+      if (response.status === 403) {
+        toast.error("Your account is pending admin approval")
       } else {
-        toast.error('Invalid email or password')
+        toast.error(data.msg || "Login failed")
       }
-    } catch (error) {
-      toast.error('Login failed. Please try again.')
-    } finally {
-      setLoading(false)
+      return
     }
+
+    // 🔐 Save JWT
+    localStorage.setItem("token", data.token)
+
+    // 👤 Save user
+    localStorage.setItem("dayflow_user", JSON.stringify(data.employee))
+    setUser(data.employee)
+    setIsAdmin(data.employee.role?.toUpperCase() === "ADMIN")
+
+
+
+    toast.success("Login successful!")
+    if (data.employee.role === "ADMIN") {
+  navigate("/dashboard")
+} else {
+  navigate("/dashboard")
+}
+
+  } catch (error) {
+    toast.error("Server error. Please try again.")
+  } finally {
+    setLoading(false)
   }
+}
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">

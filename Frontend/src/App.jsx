@@ -11,6 +11,8 @@ import Profile from './pages/Profile'
 import Attendance from './pages/Attendance'
 import LeaveManagement from './pages/LeaveManagement'
 import Payroll from './pages/Payroll'
+import PendingEmployees from "./pages/PendingEmployees"
+
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth()
@@ -116,6 +118,17 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+  path="/admin/pending-employees"
+  element={
+    <ProtectedRoute>
+      <LayoutWrapper>
+        <PendingEmployees />
+      </LayoutWrapper>
+    </ProtectedRoute>
+  }
+/>
+
           <Route
             path="/payroll"
             element={
